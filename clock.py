@@ -5,11 +5,18 @@ import datetime
 
 try:
     import unicornhathd as unicorn
-    print("unicorn hat hd detected")
+#   print("unicorn hat hd detected")
 except ImportError:
     from unicorn_hat_sim import unicornhathd as unicorn
 
+# unicorn.rotation(180)
 unicorn.brightness(0.5)
+
+yellow = datetime.datetime.strptime("19:0:0","%H:%M:%S").time()
+red = datetime.datetime.strptime("20:0:0","%H:%M:%S").time()
+green = datetime.datetime.strptime("07:0:0","%H:%M:%S").time()
+off = datetime.datetime.strptime("08:30:0","%H:%M:%S").time()
+old_display = "off"
 
 # There are 4 different types of patterns used when generating
 # a number that is to be placed in a rectangle 3X5 pixels. Combinations of these
@@ -39,6 +46,29 @@ def leftSide(start, row):
 
 def rightSide(start, row):
   unicorn.set_pixel(start+2, row, 255, 255, 255)
+
+
+def nightlight():
+   global old_display
+   now = datetime.datetime.now().time()
+   if now >= green and now < off: 
+      r,g,b = 0,255,0
+      display = "green"
+   elif now >= yellow and now < red:
+      r,g,b = 255,255,0
+      display = "yellow"
+   elif now>=red  or now<green:
+      r,g,b = 255,0,0
+      display = "red"
+   else:
+      r,g,b = 0,0,0
+      display = "off"
+
+   if display != old_display:
+      old_display = display
+      for y in range(5, 11):
+         for x in range(0, 16):
+            unicorn.set_pixel(x, y, r, g, b)
 
 # Numbers
 def displayZero(x, y):
@@ -158,12 +188,11 @@ def displayNumber(x,y, number):
 def clearNumberPixels(x, y):
   for y1 in range(y, y-5, -1):
     for x1 in range(x, x+3):
-      # print("x1 = "+str(x1)+" y1 = "+str(y1))
       unicorn.set_pixel(x1, y1, 0, 0, 0)
   unicorn.show()
 
 def displayTimeDots(x, y):
-  red =255 if int(datetime.datetime.now().strftime('%S'))%2 ==0 else 0
+  red = 255 if int(getTimeParts('%S')[1])%2 == 0 else 0
   unicorn.set_pixel(x, y-1, red, 0, 0)
   unicorn.set_pixel(x, y-3, red, 0, 0)
   unicorn.show()
@@ -175,14 +204,14 @@ def displayDateDots(x, y):
   unicorn.set_pixel(x, y-2, 255, 0, 0)
   unicorn.set_pixel(x, y-3, 255, 0, 0)
   unicorn.set_pixel(x, y-4, 255, 0, 0)
-  unicorn.show()  
+  unicorn.show()
 
 # Gets a specific part of the current time, passed to strftime, then it is
 # split into its individual numbers and converted into integers. Used to feed
 # the display with numbers
 def getTimeParts(timePart):
   parts = datetime.datetime.now().strftime(timePart)
-  return [int(x) for x in parts]  
+  return [int(x) for x in parts]
 
 displayedHourParts = getTimeParts('%H')
 displayedMinuteParts = getTimeParts('%M')
@@ -197,11 +226,13 @@ displayNumber(9,15, displayedMinuteParts[0])
 displayNumber(13,15, displayedMinuteParts[1])
 
 # Display Day and Month
-displayNumber(0,9, displayedDayParts[0])
-displayNumber(4,9, displayedDayParts[1])
-displayDateDots(7,9)
-displayNumber(9,9, displayedMonthParts[0])
-displayNumber(13,9, displayedMonthParts[1])
+displayNumber(0,4, displayedDayParts[0])
+displayNumber(4,4, displayedDayParts[1])
+displayDateDots(7,4)
+displayNumber(9,4, displayedMonthParts[0])
+displayNumber(13,4, displayedMonthParts[1])
+
+nightlight()
 
 try:
   while True:
@@ -235,24 +266,27 @@ try:
     # Only update first day number if it is different to what is currently displayed
     if dayParts[0] != displayedDayParts[0]:
       displayedDayParts[0] = dayParts[0]
-      displayNumber(0,9, dayParts[0])
+      displayNumber(0,4, dayParts[0])
 
     # Only update second day number if it is different to what is currently displayed
     if dayParts[1] != displayedDayParts[1]:
       displayedDayParts[1] = dayParts[1]
-      displayNumber(4,9, dayParts[1])
+      displayNumber(4,4, dayParts[1])
 
     # Only update first month number if it is different to what is currently displayed
     if monthParts[0] != displayedMonthParts[0]:
       displayedMonthParts[0] = monthParts[0]
-      displayNumber(9,9, monthParts[0])
+      displayNumber(9,4, monthParts[0])
 
     # Only update second month number if it is different to what is currently displayed
     if monthParts[1] != displayedMonthParts[1]:
       displayedMonthParts[1] = monthParts[1]
-      displayNumber(13,9, monthParts[1])
+      displayNumber(13,4, monthParts[1])
 
     displayTimeDots(7,15)
+
+    nightlight()
+
     unicorn.show()
     # Sleep for 0.5 because the display doesn't need to update that often
     time.sleep(0.5)
