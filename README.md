@@ -1,5 +1,5 @@
 # Unicorn Hat HD Clock
-A simple clock for the Unicorn Hat HD that displays the current time and date with an animated seconds counter row. 
+A simple clock for the Unicorn Hat HD that displays the current time and date with a night light to help children know when to wake up.
 
 ## What you need to run this program
 * Python Installed
@@ -12,6 +12,6 @@ Its not necessary to have a Unicorn Hat HD or a Raspberry Pi to run this program
 </p>
 You can get this handy tool at https://github.com/jayniz/unicorn-hat-sim . When I was happy with the code I ran it on the Raspberry Pi.
 <p align="center">
-  <img width=500 src="https://raw.githubusercontent.com/jonathanmeaney/unicorn-hat-hd-clock/master/real-life.jpg">
+  <img width=500 src="https://raw.githubusercontent.com/mfraser/unicorn-hat-hd-clock/master/real-life.jpg">
 </p>
 
