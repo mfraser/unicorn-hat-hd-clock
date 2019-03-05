@@ -1,63 +1,58 @@
 #!/usr/bin/env python
 
 import time
-import datetime
+from datetime import datetime
 
 try:
     import unicornhathd as unicorn
-#   print("unicorn hat hd detected")
 except ImportError:
     from unicorn_hat_sim import unicornhathd as unicorn
 
-# unicorn.rotation(180)
-unicorn.brightness(0.5)
+unicorn.brightness(0.2)
+unicorn.off()
 
-yellow = datetime.datetime.strptime("19:0:0","%H:%M:%S").time()
-red = datetime.datetime.strptime("20:0:0","%H:%M:%S").time()
-green = datetime.datetime.strptime("07:0:0","%H:%M:%S").time()
-off = datetime.datetime.strptime("08:30:0","%H:%M:%S").time()
+y1 = [datetime.strptime("19:00:00","%H:%M:%S").time()] * 7
+r1 = [datetime.strptime("20:00:00","%H:%M:%S").time()] * 7
+g1 = [datetime.strptime("07:00:00","%H:%M:%S").time()] * 7
+o1 = [datetime.strptime("08:30:00","%H:%M:%S").time()] * 7
+
+g1[0] = g1[6] = datetime.strptime("08:00:00","%H:%M:%S").time()
+
+#print g1
+
 old_display = "off"
 
-# There are 4 different types of patterns used when generating
-# a number that is to be placed in a rectangle 3X5 pixels. Combinations of these
-# are used to create a number pattern such as:
-#   * * *
-#   *
-#   * * *
-#   *   *
-#   * * *
+digit = [["***", "* *","* *", "* *","***"],
+         ["  *","  *","  *","  *","  *"],
+         ["***","  *","***","*  ","***"],
+         ["***","  *","***","  *","***"],
+         ["* *","* *","***","  *","  *"],
+         ["***","*  ","***","  *","***"],
+         ["***","*  ","***","* *","***"],
+         ["***","  *","  *","  *","  *"],
+         ["***","* *","***","* *","***"],
+         ["***","* *","***","  *","***"]]
 
-# 1) * * * Full Row
-# 2) *   * Both Sides
-# 3)     * Right Side
-# 4) *     Left Side
-
-# Composition methods
-def fullLine(start, row):
-  for x in range(start, start+3):
-    unicorn.set_pixel(x, row, 255, 255, 255)
-
-def bothSides(start, row):
-  unicorn.set_pixel(start, row, 255, 255, 255)
-  unicorn.set_pixel(start+2, row, 255, 255, 255)
-
-def leftSide(start, row):
-  unicorn.set_pixel(start, row, 255, 255, 255)
-
-def rightSide(start, row):
-  unicorn.set_pixel(start+2, row, 255, 255, 255)
-
+def displayNumber(x,y,d):
+   for i in  digit[d]:
+      for j in range(3):
+         r,g,b = (255,255,255) if i[j] == "*" else (0,0,0)
+         unicorn.set_pixel(x+j, y, r, g, b)
+      y-=1
+   unicorn.show()
 
 def nightlight():
    global old_display
-   now = datetime.datetime.now().time()
-   if now >= green and now < off: 
+   now = datetime.now().time()
+   week_day = getTimeParts('%w')[0]
+
+   if now >= g1[week_day] and now < o1[week_day]: 
       r,g,b = 0,255,0
       display = "green"
-   elif now >= yellow and now < red:
+   elif now >= y1[week_day] and now < r1[week_day]:
       r,g,b = 255,255,0
       display = "yellow"
-   elif now>=red  or now<green:
+   elif now >= r1[week_day]  or now < g1[week_day]:
       r,g,b = 255,0,0
       display = "red"
    else:
@@ -70,147 +65,27 @@ def nightlight():
          for x in range(0, 16):
             unicorn.set_pixel(x, y, r, g, b)
 
-# Numbers
-def displayZero(x, y):
-  clearNumberPixels(x, y)
-  fullLine(x, y)
-  bothSides(x, y-1)
-  bothSides(x, y-2)
-  bothSides(x, y-3)
-  fullLine(x, y-4)
-  unicorn.show()
-
-def displayOne(x, y):
-  clearNumberPixels(x, y)
-  rightSide(x, y)
-  rightSide(x, y-1)
-  rightSide(x, y-2)
-  rightSide(x, y-3)
-  rightSide(x, y-4)
-  unicorn.show()
-
-def displayTwo(x, y):
-  clearNumberPixels(x, y)
-  fullLine(x, y)
-  rightSide(x, y-1)
-  fullLine(x, y-2)
-  leftSide(x, y-3)
-  fullLine(x, y-4)
-  unicorn.show()
-
-def displayThree(x, y):
-  clearNumberPixels(x, y)
-  fullLine(x, y)
-  rightSide(x, y-1)
-  fullLine(x, y-2)
-  rightSide(x, y-3)
-  fullLine(x, y-4)
-  unicorn.show()
-
-def displayFour(x, y):
-  clearNumberPixels(x, y)
-  bothSides(x, y)
-  bothSides(x, y-1)
-  fullLine(x, y-2)
-  rightSide(x, y-3)
-  rightSide(x, y-4)
-  unicorn.show()
-
-def displayFive(x, y):
-  clearNumberPixels(x, y)
-  fullLine(x, y)
-  leftSide(x, y-1)
-  fullLine(x, y-2)
-  rightSide(x, y-3)
-  fullLine(x, y-4)
-  unicorn.show()
-
-def displaySix(x, y):
-  clearNumberPixels(x, y)
-  fullLine(x, y)
-  leftSide(x, y-1)
-  fullLine(x, y-2)
-  bothSides(x, y-3)
-  fullLine(x, y-4)
-  unicorn.show()
-
-def displaySeven(x, y):
-  clearNumberPixels(x, y)
-  fullLine(x, y)
-  rightSide(x, y-1)
-  rightSide(x, y-2)
-  rightSide(x, y-3)
-  rightSide(x, y-4)
-  unicorn.show()
-
-def displayEight(x, y):
-  clearNumberPixels(x, y)
-  fullLine(x, y)
-  bothSides(x, y-1)
-  fullLine(x, y-2)
-  bothSides(x, y-3)
-  fullLine(x, y-4)
-  unicorn.show()
-
-def displayNine(x, y):
-  clearNumberPixels(x, y)
-  fullLine(x, y)
-  bothSides(x, y-1)
-  fullLine(x, y-2)
-  rightSide(x, y-3)
-  fullLine(x, y-4)
-  unicorn.show()
-
-def displayNumber(x,y, number):
-  if number == 0:
-    displayZero(x,y)
-  elif number == 1:
-    displayOne(x,y)
-  elif number == 2:
-    displayTwo(x,y)
-  elif number == 3:
-    displayThree(x,y)
-  elif number == 4:
-    displayFour(x,y)
-  elif number == 5:
-    displayFive(x,y)
-  elif number == 6:
-    displaySix(x,y)
-  elif number == 7:
-    displaySeven(x,y)
-  elif number == 8:
-    displayEight(x,y)
-  elif number == 9:
-    displayNine(x,y)
-
-# Clears the pixels in a rectangle. x,y is the top left corner of the rectangle
-# and its dimensions are 3X5
-def clearNumberPixels(x, y):
-  for y1 in range(y, y-5, -1):
-    for x1 in range(x, x+3):
-      unicorn.set_pixel(x1, y1, 0, 0, 0)
-  unicorn.show()
-
 def displayTimeDots(x, y):
-  red = 255 if int(getTimeParts('%S')[1])%2 == 0 else 0
-  unicorn.set_pixel(x, y-1, red, 0, 0)
-  unicorn.set_pixel(x, y-3, red, 0, 0)
+  r,g,b = (128,0,128) if int(getTimeParts('%S')[1])%2 == 0 else (0,0,0)
+  unicorn.set_pixel(x, y-1, r, g, b)
+  unicorn.set_pixel(x, y-3, r, g, b)
   unicorn.show()
 
 def displayDateDots(x, y):
-  unicorn.set_pixel(x+1, y, 255, 0, 0)
-  unicorn.set_pixel(x+1, y-1, 255, 0, 0)
-  unicorn.set_pixel(x+1, y-2, 255, 0, 0)
-  unicorn.set_pixel(x, y-2, 255, 0, 0)
-  unicorn.set_pixel(x, y-3, 255, 0, 0)
-  unicorn.set_pixel(x, y-4, 255, 0, 0)
+  r,g,b = 128,0,128
+  unicorn.set_pixel(x+1, y, r, g, b)
+  unicorn.set_pixel(x+1, y-1, r, g, b)
+  unicorn.set_pixel(x+1, y-2, r, g, b)
+  unicorn.set_pixel(x, y-2, r, g, b)
+  unicorn.set_pixel(x, y-3, r, g, b)
+  unicorn.set_pixel(x, y-4, r, g, b)
   unicorn.show()
 
 # Gets a specific part of the current time, passed to strftime, then it is
 # split into its individual numbers and converted into integers. Used to feed
 # the display with numbers
 def getTimeParts(timePart):
-  parts = datetime.datetime.now().strftime(timePart)
+  parts = datetime.now().strftime(timePart)
   return [int(x) for x in parts]
 
 displayedHourParts = getTimeParts('%H')
