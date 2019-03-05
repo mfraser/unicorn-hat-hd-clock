@@ -5,7 +5,7 @@ A simple clock for the Unicorn Hat HD that displays the current time and date wi
 * Python Installed
 * [unicorn-hat-sim](https://github.com/jayniz/unicorn-hat-sim) OR A Raspberry Pi and Unicorn Hat HD
 
-Its not necessary to have a Unicorn Hat HD or a Raspberry Pi to run this program. You just need to have Python installed on your computer along with the Unicorn HAT (HD) simulator. The simulator is a very handy tool that demonstrates what your code will do on the Unicorn Hat HD.
+It is not necessary to have a Unicorn Hat HD or a Raspberry Pi to run this program. You just need to have Python installed on your computer along with the Unicorn HAT (HD) simulator. The simulator is a very handy tool that demonstrates what your code will do on the Unicorn Hat HD.
 
 You can get this handy tool at https://github.com/jayniz/unicorn-hat-sim .
 <p align="center">
